@@ -3,7 +3,7 @@ const Mustache = require('mustache')
 const http = require('axios')
 
 // const restaurantsApiRoot = process.env.restaurants_api
-const restaurantsApiRoot = 'https://npy4zifszi.execute-api.us-east-2.amazonaws.com/dev/restaurants'
+const restaurantsApiRoot = 'https://1wt54nzt43.execute-api.us-east-2.amazonaws.com/dev/restaurants'
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 let html
@@ -21,7 +21,9 @@ function loadHtml () {
 const getRestaurants = async () => {
   // const httpReq = await http.get(restaurantsApiRoot)
   // return (await httpReq).data
+  
   const {data} = await http.get(`${restaurantsApiRoot}`)
+  console.log('restaurantsApiRoot ',restaurantsApiRoot)
   console.log('restaurant data --> ',data)
   return data
 }

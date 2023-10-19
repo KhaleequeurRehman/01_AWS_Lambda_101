@@ -7,17 +7,21 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs14.x
   stage: dev
   region: us-east-2
   profile: khaleeq
 
   iamRoleStatements:
     - Effect: Allow
-      Action: 
-        - dynamodb:scan
-        - dynamodb:BatchWriteItem
+      Action: "dynamodb:*"
+        # - dynamodb:Query
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
       Resource: !GetAtt RestaurantsTable.Arn
+      # Resource: "arn:aws:dynamodb:us-east-2:YOUR_AWS_ACCOUNT_ID:table/RestaurantsTable"
 
 functions:
   get-index:
@@ -38,11 +42,21 @@ functions:
     environment:
       restaurants_table: !Ref RestaurantsTable
 
+  seed-restaurants:
+    handler: seed-restaurants.handler
+    events:
+      - http:
+          path: /seed-restaurants
+          method: get
+    environment:
+      restaurants_table: !Ref RestaurantsTable
+
 resources:
   Resources:
     RestaurantsTable:
       Type: AWS::DynamoDB::Table
       Properties:
+        TableName: RestaurantsTable
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: name
@@ -57,3 +71,72 @@ resources:
 
 plugins:
   - serverless-export-env
+
+
+
+
+
+
+
+
+# service: yancui-session-task-${self:custom.name}
+# frameworkVersion: "2 || 3"
+
+# custom:
+#   name: khaleeque
+#   email: kmem98@gmail.com
+
+# provider:
+#   name: aws
+#   runtime: nodejs18.x
+#   stage: dev
+#   region: us-east-2
+#   profile: khaleeq
+
+#   iamRoleStatements:
+#     - Effect: Allow
+#       Action: "dynamodb:*"
+#         # - dynamodb:scan
+#         # - dynamodb:BatchWriteItem
+#       # Resource: !GetAtt RestaurantsTable.Arn
+#       Resource: "*"
+
+# functions:
+#   get-index:
+#     handler: functions/get-index.handler
+#     events:
+#       - http:
+#           path: /
+#           method: get
+#     environment:
+#       restaurants_api: https://#{ApiGatewayRestApi}.execute-api.#{AWS::Region}.amazonaws.com/${self:provider.stage}/restaurants
+
+#   get-restaurants:
+#     handler: functions/get-restaurants.handler
+#     events:
+#       - http:
+#           path: /restaurants
+#           method: get
+#     environment:
+#       restaurants_table: !Ref RestaurantsTable
+
+# resources:
+#   Resources:
+#     RestaurantsTable:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         TableName: RestaurantsTable
+#         BillingMode: PAY_PER_REQUEST
+#         AttributeDefinitions:
+#           - AttributeName: name
+#             AttributeType: S
+#         KeySchema:
+#           - AttributeName: name
+#             KeyType: HASH
+
+#   Outputs:
+#     RestaurantsTableName:
+#       Value: !Ref RestaurantsTable
+
+# plugins:
+#   - serverless-export-env
